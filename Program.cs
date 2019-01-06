@@ -51,7 +51,8 @@ namespace YandexEdaBot
 
         private static async void CommandHandler(Message msg)
         {
-            switch (msg.Text)
+            var com = msg.Text.Trim().Substring(1).ToLower();
+            switch (com)
             {
                 case "/start":
                     Start(msg);

@@ -9,6 +9,8 @@ namespace YandexEdaBot
     // константы
     public static class StaticData
     {
+        public const string PATH_COUR_DB = "cour.db";
+
         public static readonly string[] COMMANDS = new[]
         {
             "start"

@@ -151,7 +151,7 @@ namespace YandexEdaBot
         private static bool IsCommand(string s)
         {
             var com = s.Trim().ToLower();
-            return com[0] == '/' && StaticData.COMMANDS.Contains(s);
+            return com[0] == '/' && StaticData.COMMANDS.Contains(com);
         }
 
         // todo
