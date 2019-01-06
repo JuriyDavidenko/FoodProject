@@ -12,7 +12,7 @@ namespace YandexEdaBot
     {
         public static List<Courier> Couriers { private set; get; } = new List<Courier>();
 
-        public BotLocalState BotState { set; get; } 
+        public UserState UserState { set; get; } 
 
         // рабочий минимум
         public long ChatId { private set; get; }
@@ -28,8 +28,7 @@ namespace YandexEdaBot
         public Courier(long chatid, string userName, string link)
         {
             Console.WriteLine($"Add new courier {userName}");
-            Couriers.Add(this);
-            BotState = BotLocalState.None;
+            UserState = UserState.None;
             ChatId = chatid;
             UserName = userName;
             PersonalLink = link;
@@ -61,32 +60,28 @@ namespace YandexEdaBot
         // сохранить базу
         public static void Save(string path = "cours.db")
         {
-            using (var sw = new StreamWriter(path, false, Encoding.UTF8))
-            {
-                foreach (var cour in Couriers)
-                {
-                    sw.WriteLine(string.Join("\t", cour.Peek()));
-                }
-                sw.Close();
-            }
+            DataBase.TryUpdateCourers();
         }
 
         // загрузить базу
         public static void Load()
         {
-            Couriers = DataBase.LoadCouriers();
+            var temp = DataBase.TryUpdateCourers();
+            if (temp != null)
+                Couriers = temp;
         }
     }
 
     // в каком состоянии бот для конкретно этого юзера
-    public enum BotLocalState
+    public enum UserState
     {
         // null
         None,
-        // авторизация прошла, делай, что хочешь
-        Free,
         // требуется ввести персональную ссылку
         WaitLink,
-
+        // ссылка проверяется
+        CheckLink,
+        // авторизация прошла, делай, что хочешь
+        Free,
     }
 }

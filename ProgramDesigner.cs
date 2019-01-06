@@ -8,6 +8,9 @@ using Telegram.Bot.Args;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
+using Absolutly;
+
+using U = Absolutly.Utility;
 
 namespace YandexEdaBot
 {
@@ -24,6 +27,7 @@ namespace YandexEdaBot
             Courier.Load();
             Console.WriteLine("База загружена");
 
+            // todo
             //var watcher = new FileSystemWatcher(Environment.CurrentDirectory);
             //watcher.Created += Watcher_Created;
             //watcher.Changed += Watcher_Changed;
@@ -38,7 +42,19 @@ namespace YandexEdaBot
             bot.OnReceiveError += BotOnReceiveError;
 
             bot.StartReceiving(Array.Empty<UpdateType>());
-            Console.ReadLine();
+            string input = "";
+            while (input != "exit" || input != "end")
+            {
+                switch (input)
+                {
+                    case "cours":
+                        Console.WriteLine(U.StrCol(Environment.NewLine, Courier.Couriers));
+                        break;
+                    default:
+                        break;
+                }
+                input = Console.ReadLine().Trim().ToLower();
+            }
             bot.StopReceiving();
         }
 
