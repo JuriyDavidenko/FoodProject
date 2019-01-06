@@ -148,10 +148,10 @@ namespace YandexEdaBot
                 receiveErrorEventArgs.ApiRequestException.Message);
         }
 
-        // todo
         private static bool IsCommand(string s)
         {
-            return true;
+            var com = s.Trim().ToLower();
+            return com[0] == '/' && StaticData.COMMANDS.Contains(s);
         }
 
         // todo

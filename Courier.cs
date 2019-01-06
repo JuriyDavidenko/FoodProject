@@ -72,24 +72,9 @@ namespace YandexEdaBot
         }
 
         // загрузить базу
-        public static void Load(string path = "cours.db")
+        public static void Load()
         {
-            var cours = new List<Courier>();
-            using (var sr = new StreamReader(path, Encoding.UTF8))
-            {
-                string line;
-                while (!sr.EndOfStream)
-                {
-                    line = sr.ReadLine();
-                    if (!line.IsNullOrEmpty())
-                    {
-                        var args = line.Split('\t');
-                        cours.Add(new Courier(long.Parse(args[0]), args[1], args[2]));
-                    }
-                }
-                sr.Close();
-            }
-            Couriers = cours;
+            Couriers = DataBase.LoadCouriers();
         }
     }
 

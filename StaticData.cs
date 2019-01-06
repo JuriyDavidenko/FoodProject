@@ -9,6 +9,11 @@ namespace YandexEdaBot
     // константы
     public static class StaticData
     {
+        public static readonly string[] COMMANDS = new[]
+        {
+            "start"
+        };
+
         public const string HINT_DIALOG = "Нажми одну из кнопок";
         public const string HINT_SMENA = "Нужно выбрать смену!";
 
