@@ -17,7 +17,6 @@ namespace YandexEdaBot
     public partial class Program
     {
         public static Telegram.Bot.TelegramBotClient bot;
-        public static Courier User;
 
         static void Main()
         {
@@ -42,6 +41,8 @@ namespace YandexEdaBot
             bot.OnReceiveError += BotOnReceiveError;
 
             bot.StartReceiving(Array.Empty<UpdateType>());
+
+
             while (true)
             {
                 var input = Console.ReadLine().Trim().ToLower();
@@ -101,7 +102,7 @@ namespace YandexEdaBot
             if (message == null || message.Type != MessageType.Text) return;
 
             // костыль, чтобы не было ошибки, если юзера еще нет, а кидало сразу на старт
-            if (User == null)
+            if (Courier.FindById(message.Chat.Id) == null)
             {
                 Start(message);
             }
@@ -168,14 +169,15 @@ namespace YandexEdaBot
 
         private static bool IsCommand(string s)
         {
-            var com = s.Trim().ToLower();
-            return com[0] == '/' && StaticData.COMMANDS.Contains(com);
+            var com = s.Trim().ToLower().Substring(1);
+            var res = s[0] == '/' && StaticData.COMMANDS.Contains(com);
+            return res;
         }
 
         // todo
         private static bool IsKeyboardKey(string s)
         {
-            return true;
+            return false;
         }
     }
 }

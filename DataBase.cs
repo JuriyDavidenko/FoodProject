@@ -24,22 +24,38 @@ namespace YandexEdaBot
                 var id = (row.ElementAtOrDefault(0) ?? "").ToLong();
                 var userName = row.ElementAtOrDefault(1) ?? "";
                 var link = row.ElementAtOrDefault(2) ?? "";
-                cours.Add(new Courier(id, userName, link));
+                var status = row.ElementAtOrDefault(3) ?? "";
+                var user = new Courier(id, userName, link);
+                switch (status.Trim().ToLower())
+                {
+                    case "wait":
+                        user.UserState = UserState.WaitLink;
+                        break;
+                    case "check":
+                        user.UserState = UserState.CheckLink;
+                        break;
+                    case "free":
+                        user.UserState = UserState.Free;
+                        break;
+                    default:
+                        user.UserState = UserState.None;
+                        break;
+                }
+                cours.Add(user);
             }
             return cours;
         }
 
-        // todo
-        private static void SaveCourers(string path = StaticData.PATH_COUR_DB)
+        public static void SaveCourers(string path = StaticData.PATH_COUR_DB)
         {
             var doc = new Excel();
             lastCourDbHash = ComputeMD5Checksum(path);
             doc.FileOpen(path);
-            foreach (var row in doc.Rows.Skip(1))
+            int row = 1;
+            foreach (var cour in Courier.Couriers)
             {
-                var id = (row.ElementAtOrDefault(0) ?? "").ToLong();
-                var userName = row.ElementAtOrDefault(1) ?? "";
-                var link = row.ElementAtOrDefault(2) ?? "";
+                doc.Rows[row].AddRange(cour.Peek());
+                row++;
             }
         }
 
@@ -61,7 +77,7 @@ namespace YandexEdaBot
                 byte[] fileData = new byte[fs.Length];
                 fs.Read(fileData, 0, (int)fs.Length);
                 byte[] checkSum = md5.ComputeHash(fileData);
-                string result = BitConverter.ToString(checkSum).Replace("-", String.Empty);
+                string result = BitConverter.ToString(checkSum).Replace("-", string.Empty);
                 return result;
             }
         }

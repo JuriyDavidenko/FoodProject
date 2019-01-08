@@ -28,7 +28,6 @@ namespace YandexEdaBot
         public Courier(long chatid, string userName, string link)
         {
             Console.WriteLine($"Add new courier {userName}");
-            UserState = UserState.None;
             ChatId = chatid;
             UserName = userName;
             PersonalLink = link;
@@ -37,11 +36,27 @@ namespace YandexEdaBot
         // данные курьера в массив строк
         public string[] Peek()
         {
+            var status = "none";
+            switch (UserState)
+            {
+                case UserState.WaitLink:
+                    status = "wait";
+                    break;
+                case UserState.CheckLink:
+                    status = "check";
+                    break;
+                case UserState.Free:
+                    status = "free";
+                    break;
+                default:
+                    break;
+            }
             return new string[]
             {
                ChatId.ToString(),
                UserName,
-               PersonalLink
+               PersonalLink,
+               status
             };
         }
 

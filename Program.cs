@@ -9,6 +9,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
+using Absolutly;
 
 namespace YandexEdaBot
 {
@@ -18,22 +19,25 @@ namespace YandexEdaBot
         {
             var chatId = msg.Chat.Id;
             var userName = msg.Chat.Username;
+            Console.WriteLine($"{userName} {chatId}");
             // если корректен юзернейм
             if (userName.StartsWith("foodfox"))
             {
                 // если юзер уже авторизирован
                 if (Courier.IsAuth(chatId))
                 {
-                    User = Courier.FindById(chatId);
                     await bot.SendTextMessageAsync(chatId, $"Добро пожаловать, {userName}!");
                 }
                 // иначе переход к регистрации
                 else
                 {
                     await bot.SendTextMessageAsync(chatId, "Введите ссылку на персональный график");
-
+                    Courier.FindById(msg.Chat.Id).UserState = UserState.WaitLink;
+                    DataBase.SaveCourers();
                 }
-            } else
+            }
+            // не корректный юзернейм
+            else
             {
                 await bot.SendTextMessageAsync(chatId, "Ваш юзернейм некорректен!");
             }
@@ -46,7 +50,19 @@ namespace YandexEdaBot
 
         private static async void TextHandler(Message msg)
         {
-
+            var text = msg.Text.Trim().ToLower();
+            var user = Courier.FindById(msg.Chat.Id);
+            if (user == null)
+            {
+                await bot.SendTextMessageAsync(msg.Chat.Id, "Вы не зарегистрированы!");
+                return;
+            }
+            if (user.UserState == UserState.WaitLink && text.IsUrl())
+            {
+                user.UserState = UserState.CheckLink;
+                await bot.SendTextMessageAsync(msg.Chat.Id, "Ваша ссылка проверяется.");
+                DataBase.SaveCourers();
+            }
         }
 
         private static async void CommandHandler(Message msg)
@@ -54,7 +70,7 @@ namespace YandexEdaBot
             var com = msg.Text.Trim().Substring(1).ToLower();
             switch (com)
             {
-                case "/start":
+                case "start":
                     Start(msg);
                     break;
                 default:
