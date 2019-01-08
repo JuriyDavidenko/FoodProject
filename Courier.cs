@@ -45,6 +45,11 @@ namespace YandexEdaBot
             };
         }
 
+        public override string ToString()
+        {
+            return $"{ChatId} {UserName} {PersonalLink}";
+        }
+
         // есть ли в базе курьер с таким Id
         public static bool IsAuth(long chatId)
         {

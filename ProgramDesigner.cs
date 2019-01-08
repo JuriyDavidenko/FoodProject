@@ -42,20 +42,22 @@ namespace YandexEdaBot
             bot.OnReceiveError += BotOnReceiveError;
 
             bot.StartReceiving(Array.Empty<UpdateType>());
-            string input = "";
-            while (input != "exit" || input != "end")
+            while (true)
             {
+                var input = Console.ReadLine().Trim().ToLower();
                 switch (input)
                 {
                     case "cours":
                         Console.WriteLine(U.StrCol(Environment.NewLine, Courier.Couriers));
                         break;
+                    case "end":
+                    case "exit":
+                        bot.StopReceiving();
+                        return;
                     default:
                         break;
                 }
-                input = Console.ReadLine().Trim().ToLower();
             }
-            bot.StopReceiving();
         }
 
         /*private static void Watcher_Changed(object sender, FileSystemEventArgs e)
