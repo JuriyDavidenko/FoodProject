@@ -10,6 +10,7 @@ using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InlineQueryResults;
 using Telegram.Bot.Types.ReplyMarkups;
 using Absolutly;
+using U = Absolutly.Utility;
 
 namespace YandexEdaBot
 {
@@ -19,20 +20,36 @@ namespace YandexEdaBot
         {
             var chatId = msg.Chat.Id;
             var userName = msg.Chat.Username;
+            if (userName.IsNullOrEmpty()) return;
             Console.WriteLine($"{userName} {chatId}");
             // если корректен юзернейм
-            if (userName.StartsWith("foodfox"))
+            if (userName.ToLower().StartsWith("foodfox"))
             {
                 // если юзер уже авторизирован
                 if (Courier.IsAuth(chatId))
                 {
+                    var user = Courier.FindById(msg.Chat.Id);
                     await bot.SendTextMessageAsync(chatId, $"Добро пожаловать, {userName}!");
+                    switch (user.UserState)
+                    {
+                        case UserState.Free:
+                            ReplyKeyboardMarkup ReplyKeyboard = StaticData.KEYBOARD; 
+                            await bot.SendTextMessageAsync(
+                                chatId,
+                                "Используйте клавиатуру",
+                                replyMarkup: ReplyKeyboard);
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 // иначе переход к регистрации
                 else
                 {
+                    var user = new Courier(chatId, userName, "");
+                    user.UserState = UserState.WaitLink;
+                    Courier.Couriers.AddSmart(user);
                     await bot.SendTextMessageAsync(chatId, "Введите ссылку на персональный график");
-                    Courier.FindById(msg.Chat.Id).UserState = UserState.WaitLink;
                     DataBase.SaveCourers();
                 }
             }
@@ -45,7 +62,27 @@ namespace YandexEdaBot
 
         private static async void KeyboardHandler(Message msg)
         {
-
+            var id = msg.Chat.Id;
+            var user = Courier.FindById(msg.Chat.Id);
+            switch (msg.Text)
+            {
+                case StaticData.KB_BTN_GRAPHIC:
+                    break;
+                case StaticData.KB_BTN_HELP:
+                    msg.Text = "Нужна помощь";
+                    await bot.ForwardMessageAsync(CHAT_HELP_ID, id, msg.MessageId);
+                    break;
+                case StaticData.KB_BTN_FAQ:
+                    await bot.SendTextMessageAsync(id, StaticData.FAQ);
+                    break;
+                case StaticData.KB_BTN_FEEDBACK:
+                    break;
+                case StaticData.KB_BTN_ABOUT:
+                    await bot.SendTextMessageAsync(id, U.StrCol(user.Peek()));
+                    break;
+                default:
+                    break;
+            }
         }
 
         private static async void TextHandler(Message msg)
@@ -57,11 +94,18 @@ namespace YandexEdaBot
                 await bot.SendTextMessageAsync(msg.Chat.Id, "Вы не зарегистрированы!");
                 return;
             }
-            if (user.UserState == UserState.WaitLink && text.IsUrl())
+            if (user.UserState == UserState.WaitLink)
             {
-                user.UserState = UserState.CheckLink;
-                await bot.SendTextMessageAsync(msg.Chat.Id, "Ваша ссылка проверяется.");
-                DataBase.SaveCourers();
+                if (text.IsUrl())
+                {
+                    user.UserState = UserState.CheckLink;
+                    user.PersonalLink = text;
+                    await bot.SendTextMessageAsync(msg.Chat.Id, "Ваша ссылка проверяется.");
+                    DataBase.SaveCourers();
+                } else
+                {
+                    await bot.SendTextMessageAsync(msg.Chat.Id, "Некорректная ссылка!");
+                }
             }
         }
 

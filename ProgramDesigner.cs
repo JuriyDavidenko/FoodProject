@@ -17,6 +17,7 @@ namespace YandexEdaBot
     public partial class Program
     {
         public static Telegram.Bot.TelegramBotClient bot;
+        private const long CHAT_HELP_ID = -1001312146010;
 
         static void Main()
         {
@@ -101,13 +102,36 @@ namespace YandexEdaBot
             // сообщение существует и является текстом
             if (message == null || message.Type != MessageType.Text) return;
 
+            var user = Courier.FindById(message.Chat.Id);
+
             // костыль, чтобы не было ошибки, если юзера еще нет, а кидало сразу на старт
-            if (Courier.FindById(message.Chat.Id) == null)
+            if (user == null)
             {
-                Start(message);
+                if (message.Chat.Id == CHAT_HELP_ID)
+                {
+                    if (message.ReplyToMessage != null && message.ReplyToMessage.Text != message.Text)
+                    {
+                        var forwarded = message.ReplyToMessage?.ForwardFrom?.Id;
+                        // костыль
+                        if (forwarded == null) return;
+
+                        Console.WriteLine($"help reply: {message.ReplyToMessage.ForwardFrom.Id} {message.Chat.Id} {message.MessageId}");
+                        await bot.ForwardMessageAsync(message.ReplyToMessage.ForwardFrom.Id, message.Chat.Id, message.MessageId);
+                    } else
+                    {
+                        return;
+                    }
+                } else
+                {
+                    Start(message);
+                    return;
+                }
             }
+
+            if (message.Chat.Id == CHAT_HELP_ID) return;
+
             // является нажатием кнопки клавиатуры
-            else if (IsKeyboardKey(message.Text))
+            if (IsKeyboardKey(message.Text))
             {
                 // обработчик кнопок
                 KeyboardHandler(message);
@@ -132,9 +156,9 @@ namespace YandexEdaBot
             var query = callbackQueryEventArgs.CallbackQuery;
             switch (query.Data)
             {
-                case StaticData.INLINE_LOG:
+                /*case StaticData.INLINE_LOG:
                     await bot.SendTextMessageAsync(query.Message.Chat.Id, "kek");
-                    break;
+                    break;  */
                 default:
                     // вывести тест выбранной кнопки
                     await bot.AnswerCallbackQueryAsync(
@@ -174,9 +198,16 @@ namespace YandexEdaBot
             return res;
         }
 
-        // todo
         private static bool IsKeyboardKey(string s)
         {
+            var text = s.Trim();
+            foreach (var row in StaticData.KEYBOARD)
+            {
+                foreach (var btn in row)
+                {
+                    if (btn == text) return true;
+                }       
+            }
             return false;
         }
     }

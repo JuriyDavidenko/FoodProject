@@ -16,18 +16,24 @@ namespace YandexEdaBot
             "start"
         };
 
-        public const string HINT_DIALOG = "Нажми одну из кнопок";
-        public const string HINT_SMENA = "Нужно выбрать смену!";
+        public const string KB_BTN_GRAPHIC = "График";
+        public const string KB_BTN_HELP = "Помощь";
+        public const string KB_BTN_FAQ = "FAQ";
+        public const string KB_BTN_FEEDBACK = "Обратная связь";
+        public const string KB_BTN_ABOUT = "О себе";
 
-        public const string BUTTON_LOG_SUPER_SELPHIEBOT = "Логист/Супервайзер/Селфибот";
-        public const string BUTTON_SMENI = "Смены";
-        public const string BUTTON_MANUAL = "Мануал";
-        public const string BUTTON_MY_DATA = "Мои данные";
-
-        public const string INLINE_LOG = "Написать логисту";
+        public const string FAQ = "тут будет виджет";
 
 
-        public static readonly InlineKeyboardMarkup MARKUP_LOG_SUPER_SELPHIEBOT = new InlineKeyboardMarkup(new[] {
+        public static readonly string[][] KEYBOARD = new[]
+        {
+            new [] { KB_BTN_GRAPHIC },
+            new [] { KB_BTN_HELP, KB_BTN_FAQ },
+            new [] { KB_BTN_FEEDBACK, KB_BTN_ABOUT },
+        };
+
+
+        /*public static readonly InlineKeyboardMarkup MARKUP_LOG_SUPER_SELPHIEBOT = new InlineKeyboardMarkup(new[] {
             new[]
             {
                 InlineKeyboardButton.WithCallbackData(INLINE_LOG),
@@ -40,6 +46,6 @@ namespace YandexEdaBot
             {
                 InlineKeyboardButton.WithCallbackData("Селфибот"),
             }
-        });
+        });*/
     }
 }

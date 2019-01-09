@@ -12,7 +12,14 @@ namespace YandexEdaBot
     {
         public static List<Courier> Couriers { private set; get; } = new List<Courier>();
 
-        public UserState UserState { set; get; } 
+        private UserState userState = UserState.None;
+
+        public UserState UserState { set
+            {
+                Console.WriteLine($"{UserName} {userState} -> {value}");
+                userState = value;
+            }
+            get { return userState; } } 
 
         // рабочий минимум
         public long ChatId { private set; get; }
@@ -37,7 +44,7 @@ namespace YandexEdaBot
         public string[] Peek()
         {
             var status = "none";
-            switch (UserState)
+            switch (userState)
             {
                 case UserState.WaitLink:
                     status = "wait";
@@ -62,7 +69,7 @@ namespace YandexEdaBot
 
         public override string ToString()
         {
-            return $"{ChatId} {UserName} {PersonalLink}";
+            return $"{ChatId} {UserName} {PersonalLink} {userState}";
         }
 
         // есть ли в базе курьер с таким Id
@@ -103,5 +110,17 @@ namespace YandexEdaBot
         CheckLink,
         // авторизация прошла, делай, что хочешь
         Free,
+    }
+
+    public static class CListEx
+    {
+        public static void AddSmart(this List<Courier> list, Courier c)
+        {
+            if (list.Contains(c))
+            {
+                return;
+            }
+            list.Add(c);
+        }
     }
 }

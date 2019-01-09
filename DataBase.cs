@@ -19,7 +19,12 @@ namespace YandexEdaBot
             var doc = new Excel();
             lastCourDbHash = ComputeMD5Checksum(path);
             doc.FileOpen(path);
-            foreach (var row in doc.Rows.Skip(1))
+            var rows = doc?.Rows?.Skip(1);
+            if (rows == null || rows.Count() < 1)
+            {
+                return null;
+            }
+            foreach (var row in rows)
             {
                 var id = (row.ElementAtOrDefault(0) ?? "").ToLong();
                 var userName = row.ElementAtOrDefault(1) ?? "";
@@ -49,14 +54,15 @@ namespace YandexEdaBot
         public static void SaveCourers(string path = StaticData.PATH_COUR_DB)
         {
             var doc = new Excel();
-            lastCourDbHash = ComputeMD5Checksum(path);
             doc.FileOpen(path);
-            int row = 1;
+            doc.Rows.Clear();
+            doc.AddRow(new[] { "id", "username", "link", "status" });
             foreach (var cour in Courier.Couriers)
             {
-                doc.Rows[row].AddRange(cour.Peek());
-                row++;
+                doc.AddRow(cour.Peek());
             }
+            doc.FileSave(path);
+            lastCourDbHash = ComputeMD5Checksum(path);
         }
 
         public static List<Courier> TryUpdateCourers(string path = StaticData.PATH_COUR_DB)
