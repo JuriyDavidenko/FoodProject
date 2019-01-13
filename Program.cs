@@ -49,7 +49,7 @@ namespace YandexEdaBot
                     var user = new Courier(chatId, userName, "");
                     user.UserState = UserState.WaitLink;
                     Courier.Couriers.AddSmart(user);
-                    await bot.SendTextMessageAsync(chatId, "Введите ссылку на персональный график");
+                    await bot.SendTextMessageAsync(chatId, StaticData.START_MSG);
                     DataBase.SaveCourers();
                 }
             }
@@ -67,29 +67,34 @@ namespace YandexEdaBot
             switch (msg.Text)
             {
                 case StaticData.KB_BTN_GRAPHIC:
-                    // todo need check
+                    // todo need check and more
                     var link = Courier.FindById(id)?.PersonalLink;
                     var days = WebParser.GetPage(link).GetDays();
                     var sb = new StringBuilder();
                     foreach (var day in days)
                     {
-                        var dayName = day.QuerySelector("p.contentBoldColor").TextContent;
-                        var status = day.QuerySelector("p.content").TextContent;
-                        sb.AppendLine($"{dayName} {status}");
+                        sb.AppendLine(day.GetDayData());
+                        sb.AppendLine();
                     }
-                    await bot.SendTextMessageAsync(id, sb.ToString());
-                    break;
-                case StaticData.KB_BTN_HELP:
-                    msg.Text = "Нужна помощь";
-                    await bot.ForwardMessageAsync(CHAT_HELP_ID, id, msg.MessageId);
-                    break;
-                case StaticData.KB_BTN_FAQ:
-                    await bot.SendTextMessageAsync(id, StaticData.FAQ);
+                    var text = sb.ToString();
+                    await bot.SendTextMessageAsync(id, text.Replace("Локация старта:", "🗺").Replace("метро", "🚇").Replace("Метро", "🚇").Replace("Время", "⏰"));
                     break;
                 case StaticData.KB_BTN_FEEDBACK:
+                    await bot.SendTextMessageAsync(id, "Опишите вашу проблему и ждите ответа.");
+                    Courier.FindById(id).PressHelp = true;
+                    break;
+                case StaticData.KB_BTN_FAQ:
+                    // todo faq
+                    await bot.SendTextMessageAsync(id, StaticData.FAQ);
+                    break;
+                case StaticData.KB_BTN_HELP:
+                    await bot.SendTextMessageAsync(id, StaticData.HELP);
                     break;
                 case StaticData.KB_BTN_ABOUT:
-                    await bot.SendTextMessageAsync(id, U.StrCol(user.Peek()));
+                    await bot.SendTextMessageAsync(id, StaticData.ABOUT);
+                    break;
+                case StaticData.KB_BTN_MY_DATA:
+                    await bot.SendTextMessageAsync(id, StaticData.MY_DATA);
                     break;
                 default:
                     break;
@@ -111,12 +116,18 @@ namespace YandexEdaBot
                 {
                     user.UserState = UserState.CheckLink;
                     user.PersonalLink = text;
-                    await bot.SendTextMessageAsync(msg.Chat.Id, "Ваша ссылка проверяется.");
+                    await bot.SendTextMessageAsync(msg.Chat.Id, StaticData.CHECK_MSG);
                     DataBase.SaveCourers();
                 } else
                 {
                     await bot.SendTextMessageAsync(msg.Chat.Id, "Некорректная ссылка!");
                 }
+            }
+            else if (user.PressHelp)
+            {
+                user.PressHelp = false;
+                await bot.ForwardMessageAsync(CHAT_HELP_ID, msg.Chat.Id, msg.MessageId);
+                await bot.SendTextMessageAsync(msg.Chat.Id, "Вашее сообщение отправленно.");
             }
         }
 

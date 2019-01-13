@@ -17,7 +17,7 @@ namespace YandexEdaBot
     public partial class Program
     {
         public static Telegram.Bot.TelegramBotClient bot;
-        private const long CHAT_HELP_ID = -1001312146010;
+        private const long CHAT_HELP_ID = -255650882;
 
         static void Main()
         {
@@ -71,18 +71,7 @@ namespace YandexEdaBot
             {
                 if (message.Chat.Id == CHAT_HELP_ID)
                 {
-                    if (message.ReplyToMessage != null && message.ReplyToMessage.Text != message.Text)
-                    {
-                        var forwarded = message.ReplyToMessage?.ForwardFrom?.Id;
-                        // костыль
-                        if (forwarded == null) return;
-
-                        Console.WriteLine($"help reply: {message.ReplyToMessage.ForwardFrom.Id} {message.Chat.Id} {message.MessageId}");
-                        await bot.ForwardMessageAsync(message.ReplyToMessage.ForwardFrom.Id, message.Chat.Id, message.MessageId);
-                    } else
-                    {
-                        return;
-                    }
+                    return;
                 } else
                 {
                     Start(message);

@@ -27,6 +27,10 @@ namespace YandexEdaBot
         public string UserName { private set; get; }
         public string PersonalLink { set; get; }
 
+        // 
+
+        public bool PressHelp { set; get; } = false;
+
         // будущие фичи
         public string PhoneNumber { private set; get; }
         public string Metro { private set; get; }

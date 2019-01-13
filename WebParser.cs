@@ -39,4 +39,29 @@ namespace YandexEdaBot
             return page.QuerySelectorAll("td > div").Skip(1).ToList();
         }
     }
+
+    public static class ElemEx
+    {
+        public static string GetDayData(this IElement div)
+        {
+            var divText = div.QuerySelector("p.content")?.TextContent ?? "";
+
+            if (divText.Contains("Выходной") || divText.Contains("График"))
+            {
+                var dayName = div.QuerySelector("p.contentBoldColor").TextContent;
+                var status = div.QuerySelector("p.content").TextContent;
+                return $"{dayName} {status}";
+            }
+            else
+            {
+                var contents = div.QuerySelectorAll("p.content");
+                var dayName = div.QuerySelector("p.contentBoldColor").TextContent;
+                var status = contents[0].TextContent;
+                var start = contents[1].TextContent;
+                var loc = div.QuerySelector("p.contentSmalls").TextContent;
+                var time = contents[2].TextContent;
+                return $"{dayName} {status} {start} {loc} {time}";
+            }
+        }
+    }
 }

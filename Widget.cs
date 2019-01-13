@@ -11,6 +11,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace YandexEdaBot
 {
+    // todo widget
     public class Widget
     {
         private static Dictionary<int, Widget> widgets = new Dictionary<int, Widget>();
