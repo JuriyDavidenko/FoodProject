@@ -67,6 +67,17 @@ namespace YandexEdaBot
             switch (msg.Text)
             {
                 case StaticData.KB_BTN_GRAPHIC:
+                    // todo need check
+                    var link = Courier.FindById(id)?.PersonalLink;
+                    var days = WebParser.GetPage(link).GetDays();
+                    var sb = new StringBuilder();
+                    foreach (var day in days)
+                    {
+                        var dayName = day.QuerySelector("p.contentBoldColor").TextContent;
+                        var status = day.QuerySelector("p.content").TextContent;
+                        sb.AppendLine($"{dayName} {status}");
+                    }
+                    await bot.SendTextMessageAsync(id, sb.ToString());
                     break;
                 case StaticData.KB_BTN_HELP:
                     msg.Text = "Нужна помощь";

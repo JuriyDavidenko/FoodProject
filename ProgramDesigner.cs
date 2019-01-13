@@ -27,12 +27,6 @@ namespace YandexEdaBot
             Courier.Load();
             Console.WriteLine("База загружена");
 
-            // todo
-            //var watcher = new FileSystemWatcher(Environment.CurrentDirectory);
-            //watcher.Created += Watcher_Created;
-            //watcher.Changed += Watcher_Changed;
-            //watcher.EnableRaisingEvents = true;
-
             // события TelegramAPI и их обработчики
             bot.OnMessage += BotOnMessageReceived;
             bot.OnMessageEdited += BotOnMessageReceived;
@@ -61,38 +55,6 @@ namespace YandexEdaBot
                 }
             }
         }
-
-        /*private static void Watcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            if (e.Name == "отчет.txt")
-            
-                var names = ParseReport("отчет.txt");
-                foreach (var name in names)
-                {
-                    var cour = Courier.Couriers.Find(x => x.UserName == name);
-                    if (cour != null)
-                    {
-                        bot.SendTextMessageAsync(cour.ChatId, StaticData.HINT_SMENA);
-                    }
-                }
-            }
-        }
-
-        private static void Watcher_Created(object sender, FileSystemEventArgs e)
-        {
-            if (e.Name == "отчет.txt")
-            {
-                var names = ParseReport("отчет.txt");
-                foreach (var name in names)
-                {
-                    var cour = Courier.Couriers.Find(x => x.UserName == name);
-                    if (cour != null)
-                    {
-                        bot.SendTextMessageAsync(cour.ChatId, "Выбирай смену!");
-                    }
-                }
-            }
-        }*/
 
         // обработка сообщений юзера
         private static async void BotOnMessageReceived(object sender, MessageEventArgs messageEventArgs)

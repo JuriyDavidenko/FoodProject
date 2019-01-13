@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Absolutly;
+using Telegram.Bot;
 
 namespace YandexEdaBot
 {
@@ -82,6 +83,14 @@ namespace YandexEdaBot
         public static Courier FindById(long chatId)
         {
             return Couriers.Where(x => x.ChatId == chatId)?.FirstOrDefault();
+        }
+
+        public static void Mailing(TelegramBotClient bot, string text)
+        {
+            foreach (var id in Couriers.Select(x => x.ChatId))
+            {
+                bot.SendTextMessageAsync(id, text);
+            }
         }
 
         // сохранить базу
