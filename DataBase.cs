@@ -36,9 +36,6 @@ namespace YandexEdaBot
                     case "wait":
                         user.UserState = UserState.WaitLink;
                         break;
-                    case "check":
-                        user.UserState = UserState.CheckLink;
-                        break;
                     case "free":
                         user.UserState = UserState.Free;
                         break;

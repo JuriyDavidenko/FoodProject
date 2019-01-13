@@ -17,7 +17,9 @@ namespace YandexEdaBot
     public partial class Program
     {
         public static Telegram.Bot.TelegramBotClient bot;
-        private const long CHAT_HELP_ID = -255650882;
+        private const long CHAT_FEEDBACK_ID = -255650882;
+        private const long CHAT_PHOTO_ID = -255650882;
+        private const long CHAT_MAILING_ID = -251855362;
 
         static void Main()
         {
@@ -62,42 +64,61 @@ namespace YandexEdaBot
             var message = messageEventArgs.Message;
 
             // сообщение существует и является текстом
-            if (message == null || message.Type != MessageType.Text) return;
+            if (message == null) return;
 
-            var user = Courier.FindById(message.Chat.Id);
-
-            // костыль, чтобы не было ошибки, если юзера еще нет, а кидало сразу на старт
-            if (user == null)
+            if (message.Type == MessageType.Text)
             {
-                if (message.Chat.Id == CHAT_HELP_ID)
+
+                var user = Courier.FindById(message.Chat.Id);
+
+                // костыль, чтобы не было ошибки, если юзера еще нет, а кидало сразу на старт
+                if (user == null)
                 {
-                    return;
-                } else
+                    if (message.Chat.Id == CHAT_FEEDBACK_ID || message.Chat.Id == CHAT_PHOTO_ID)
+                    {
+                        return;
+                    }
+                    else if (message.Chat.Id == CHAT_MAILING_ID)
+                    {
+                        Courier.Mailing(bot, $"{message.Text}");
+                        return;
+                    }
+                    else
+                    {
+                        Start(message);
+                        return;
+                    }
+                }
+
+                if (message.Chat.Id == CHAT_FEEDBACK_ID || message.Chat.Id == CHAT_PHOTO_ID) return;
+                else if (message.Chat.Id == CHAT_MAILING_ID)
                 {
-                    Start(message);
+                    Courier.Mailing(bot, $"{message.Text}");
                     return;
                 }
-            }
 
-            if (message.Chat.Id == CHAT_HELP_ID) return;
-
-            // является нажатием кнопки клавиатуры
-            if (IsKeyboardKey(message.Text))
-            {
-                // обработчик кнопок
-                KeyboardHandler(message);
+                // является нажатием кнопки клавиатуры
+                if (IsKeyboardKey(message.Text))
+                {
+                    // обработчик кнопок
+                    KeyboardHandler(message);
+                }
+                // команда типа /start и т.д.
+                else if (IsCommand(message.Text))
+                {
+                    // обработчик команд
+                    CommandHandler(message);
+                }
+                // просто введенный текст
+                else
+                {
+                    // обработчик текста
+                    TextHandler(message);
+                }
             }
-            // команда типа /start и т.д.
-            else if (IsCommand(message.Text))
+            else if (message.Type == MessageType.Photo && Courier.FindById(message.Chat.Id) != null)
             {
-                // обработчик команд
-                CommandHandler(message);
-            }
-            // просто введенный текст
-            else
-            {
-                // обработчик текста
-                TextHandler(message);
+                await bot.ForwardMessageAsync(CHAT_PHOTO_ID, message.Chat.Id, message.MessageId);
             }
         } 
 

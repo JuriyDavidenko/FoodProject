@@ -54,9 +54,6 @@ namespace YandexEdaBot
                 case UserState.WaitLink:
                     status = "wait";
                     break;
-                case UserState.CheckLink:
-                    status = "check";
-                    break;
                 case UserState.Free:
                     status = "free";
                     break;
@@ -119,8 +116,6 @@ namespace YandexEdaBot
         None,
         // требуется ввести персональную ссылку
         WaitLink,
-        // ссылка проверяется
-        CheckLink,
         // авторизация прошла, делай, что хочешь
         Free,
     }

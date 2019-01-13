@@ -80,7 +80,7 @@ namespace YandexEdaBot
                     await bot.SendTextMessageAsync(id, text.Replace("Локация старта:", "🗺").Replace("метро", "🚇").Replace("Метро", "🚇").Replace("Время", "⏰"));
                     break;
                 case StaticData.KB_BTN_FEEDBACK:
-                    await bot.SendTextMessageAsync(id, "Опишите вашу проблему и ждите ответа.");
+                    await bot.SendTextMessageAsync(id, StaticData.FEEDBACK);
                     Courier.FindById(id).PressHelp = true;
                     break;
                 case StaticData.KB_BTN_FAQ:
@@ -112,11 +112,15 @@ namespace YandexEdaBot
             }
             if (user.UserState == UserState.WaitLink)
             {
-                if (text.IsUrl())
+                if (text.IsRegexSuccess("https?://grafik-beta\\.foodfox\\.ru/login_link\\.html\\?id=.+"))
                 {
-                    user.UserState = UserState.CheckLink;
+                    user.UserState = UserState.Free;
                     user.PersonalLink = text;
-                    await bot.SendTextMessageAsync(msg.Chat.Id, StaticData.CHECK_MSG);
+                    ReplyKeyboardMarkup ReplyKeyboard = StaticData.KEYBOARD;
+                    await bot.SendTextMessageAsync(
+                        msg.Chat.Id,
+                        StaticData.LINK_MSG,
+                        replyMarkup: ReplyKeyboard);
                     DataBase.SaveCourers();
                 } else
                 {
@@ -126,7 +130,7 @@ namespace YandexEdaBot
             else if (user.PressHelp)
             {
                 user.PressHelp = false;
-                await bot.ForwardMessageAsync(CHAT_HELP_ID, msg.Chat.Id, msg.MessageId);
+                await bot.ForwardMessageAsync(CHAT_FEEDBACK_ID, msg.Chat.Id, msg.MessageId);
                 await bot.SendTextMessageAsync(msg.Chat.Id, "Вашее сообщение отправленно.");
             }
         }
